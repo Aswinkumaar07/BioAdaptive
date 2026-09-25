@@ -34,47 +34,52 @@ export function GlowyWavesBackground() {
       const rootStyles = getComputedStyle(document.documentElement);
 
       const resolveColor = (variables: string[], alpha = 1) => {
-        const tempEl = document.createElement("div");
-        tempEl.style.position = "absolute";
-        tempEl.style.visibility = "hidden";
-        tempEl.style.width = "1px";
-        tempEl.style.height = "1px";
-        document.body.appendChild(tempEl);
-
-        // Fallback to dark color since this is a liquid-glass aesthetic
         let color = `rgba(10, 10, 12, ${alpha})`;
+        try {
+          if (typeof document === "undefined" || !document.body) return color;
 
-        for (const variable of variables) {
-          const value = rootStyles.getPropertyValue(variable).trim();
-          if (value) {
-            // Try as a direct color first, then as a shadcn HSL variable
-            tempEl.style.backgroundColor = `var(${variable})`;
-            let computedColor = getComputedStyle(tempEl).backgroundColor;
+          const tempEl = document.createElement("div");
+          tempEl.style.position = "absolute";
+          tempEl.style.visibility = "hidden";
+          tempEl.style.width = "1px";
+          tempEl.style.height = "1px";
+          document.body.appendChild(tempEl);
 
-            if (!computedColor || computedColor === "rgba(0, 0, 0, 0)" || computedColor === "transparent") {
-              tempEl.style.backgroundColor = `hsl(var(${variable}))`;
-              computedColor = getComputedStyle(tempEl).backgroundColor;
-            }
+          for (const variable of variables) {
+            const value = rootStyles.getPropertyValue(variable).trim();
+            if (value) {
+              tempEl.style.backgroundColor = `var(${variable})`;
+              let computedColor = getComputedStyle(tempEl).backgroundColor;
 
-            if (computedColor && computedColor !== "rgba(0, 0, 0, 0)" && computedColor !== "transparent") {
-              if (alpha < 1) {
-                const rgbMatch = computedColor.match(
-                  /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/
-                );
-                if (rgbMatch) {
-                  color = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${alpha})`;
+              if (!computedColor || computedColor === "rgba(0, 0, 0, 0)" || computedColor === "transparent") {
+                tempEl.style.backgroundColor = `hsl(var(${variable}))`;
+                computedColor = getComputedStyle(tempEl).backgroundColor;
+              }
+
+              if (computedColor && computedColor !== "rgba(0, 0, 0, 0)" && computedColor !== "transparent") {
+                if (alpha < 1) {
+                  const rgbMatch = computedColor.match(
+                    /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/
+                  );
+                  if (rgbMatch) {
+                    color = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${alpha})`;
+                  } else {
+                    color = computedColor;
+                  }
                 } else {
                   color = computedColor;
                 }
-              } else {
-                color = computedColor;
+                break;
               }
-              break;
             }
           }
-        }
 
-        document.body.removeChild(tempEl);
+          if (document.body.contains(tempEl)) {
+            document.body.removeChild(tempEl);
+          }
+        } catch (err) {
+          // Fallback safely to default dark aesthetic color without throwing
+        }
         return color;
       };
 

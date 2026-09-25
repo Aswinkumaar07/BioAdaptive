@@ -117,8 +117,12 @@ export function WebGLShader() {
       refs.uniforms.resolution.value = [width, height]
     }
 
-    initScene()
-    animate()
+    try {
+      initScene()
+      animate()
+    } catch (err) {
+      console.warn("[BioAdaptive] WebGL Shader initialization fallback:", err)
+    }
     window.addEventListener("resize", handleResize)
 
     return () => {

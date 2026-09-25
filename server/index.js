@@ -439,7 +439,8 @@ app.post('/api/extension/sync', (req, res) => {
 
 if (staticDistPath) {
   app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
+    // Exclude API calls, static assets, and file requests with extensions from SPA fallback
+    if (req.path.startsWith('/api') || req.path.startsWith('/assets') || req.path.includes('.')) {
       return next()
     }
     res.sendFile(path.join(staticDistPath, 'index.html'))
