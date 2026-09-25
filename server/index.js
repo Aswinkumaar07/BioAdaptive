@@ -9,7 +9,11 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001
+
+console.log('[BioAdaptive] PORT env:', process.env.PORT)
+console.log('[BioAdaptive] HOST: 0.0.0.0')
+console.log('[BioAdaptive] Listening port:', PORT)
 
 app.use(cors())
 app.use(express.json())
