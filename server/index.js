@@ -1,6 +1,12 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import db, { initDB } from './db.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -10,6 +16,21 @@ app.use(express.json())
 
 // Initialize DB schema & seed data if empty
 initDB()
+
+// Serve static built React assets if present (production deployment)
+const distPath1 = path.resolve(__dirname, '../react-app/dist')
+const distPath2 = path.resolve(process.cwd(), 'react-app/dist')
+const distPath3 = path.resolve(__dirname, 'react-app/dist')
+
+let staticDistPath = null
+if (fs.existsSync(distPath1)) staticDistPath = distPath1
+else if (fs.existsSync(distPath2)) staticDistPath = distPath2
+else if (fs.existsSync(distPath3)) staticDistPath = distPath3
+
+if (staticDistPath) {
+  console.log(`[BioAdaptive Server] Production static assets enabled from: ${staticDistPath}`)
+  app.use(express.static(staticDistPath))
+}
 
 // --- Scientific Terminology & Privacy Declarations ---
 const SYSTEM_INFO = {
@@ -416,6 +437,15 @@ app.post('/api/extension/sync', (req, res) => {
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`[BioAdaptive Fullstack Server] Running on http://localhost:${PORT}`)
+if (staticDistPath) {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next()
+    }
+    res.sendFile(path.join(staticDistPath, 'index.html'))
+  })
+}
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[BioAdaptive Fullstack Server] Running on 0.0.0.0:${PORT}`)
 })

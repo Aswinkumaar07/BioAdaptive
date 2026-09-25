@@ -1,0 +1,13 @@
+{
+  "name": "bioadaptive",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install-server": "cd server && npm install",
+    "install-react": "cd react-app && npm install",
+    "build-react": "cd react-app && npm run build",
+    "build": "npm run install-server && npm run install-react && npm run build-react",
+    "start": "node server/index.js"
+  }
+}
