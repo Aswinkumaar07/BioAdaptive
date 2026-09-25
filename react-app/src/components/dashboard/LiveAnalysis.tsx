@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { useFaceMesh } from "@/hooks/useFaceMesh"
 import { useDashboard } from "@/context/DashboardContext"
-import { Results } from "@mediapipe/face_mesh"
+import type { Results } from "@mediapipe/face_mesh"
 import { useEyeGuardian } from "@/hooks/useEyeGuardian"
 import { useVoiceBuddy } from "@/hooks/useVoiceBuddy"
 
